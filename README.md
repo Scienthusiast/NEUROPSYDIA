@@ -5,7 +5,7 @@ Neuropsydia is a python-based neuropsychological tool dedicated to cognitive ass
 
 ## How to run it using WINPYTHON ?
 
-### Install WinPython and the things needed
+#### Install WinPython and the stuff needed :
 
 1) Download the Pygame 1.9.1 (http://www.pygame.org/download.shtml) source file (pygame-1.9.1release.zip) and place it on your desktop, leave it there and go to the next step.
 
@@ -17,7 +17,7 @@ Neuropsydia is a python-based neuropsychological tool dedicated to cognitive ass
 
 5) Tadaa. you have successfuly installed all the needed things.
 
-### Launch Neuropsydia
+#### Execute Neuropsydia :
 
 1) Download the Neuropsydia folder from this github and place it whenever you want (USB keys can be a good place...).
 
