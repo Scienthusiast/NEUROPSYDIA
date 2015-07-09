@@ -3,6 +3,13 @@
 Neuropsydia is a python-based neuropsychological tool dedicated to cognitive assessment.
 
 
+#### Features
+
+- [x] Use 5 tests and save all data.
+- [x] Analyse some data and save it in a docx file.
+- [ ] Validating the tests and create a database.
+
+
 ## How to run it using WINPYTHON ?
 
 #### Install WinPython and the stuff needed :
