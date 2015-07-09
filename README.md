@@ -10,7 +10,7 @@ Current "stable" version : v 0.5
 - [x] Automatic creation of a basic summary docx file.
 
 
-#### To Do list (sorted by importance) :kissing_cat:
+#### Upcomming features :kissing_cat:
 
 v 0.5.5
 - [ ] Expanding the Launcher abilities to display tests and create the possibility to switch pages.
