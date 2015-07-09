@@ -4,7 +4,7 @@ Neuropsydia is a python-based neuropsychological tool dedicated to cognitive ass
 
 #### Main Features
 
-v 0.5
+Current "stable" version : v 0.5
 - [x] 5 almost complete tests (theorethical design, data saving).
 - [x] Basic statistics and result plotting.
 - [x] Automatic creation of a basic summary docx file.
