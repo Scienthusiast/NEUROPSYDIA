@@ -5,8 +5,8 @@ Neuropsydia is a python-based neuropsychological tool dedicated to cognitive ass
 
 #### Features :kissing_cat:
 
-- [x] Use 5 tests and save all data.
-- [x] Analyse some data and save it in a docx file.
+- [x] Run 5 tests and save all the data.
+- [x] Basic statistical analysis (comparing the participant's result to a database) and saving the summary intp a docx file.
 - [ ] Validating the tests and create a database.
 
 
