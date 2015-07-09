@@ -1,4 +1,3 @@
-![NEUROPSYDIA](https://octodex.github.com/images/yaktocat.png)
 # NEUROPSYDIA
 
 Neuropsydia is a python-based neuropsychological tool dedicated to cognitive assessment.
