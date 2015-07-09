@@ -1,0 +1,483 @@
+# -*- coding: cp1252 -*-
+import pygame,random,os, pandas,sys
+import numpy as np
+from pygame.locals import *
+from datetime import datetime
+from datetime import date
+from time import gmtime, strftime
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.mlab as mlab
+#import docx
+#from ggplot import *
+
+
+screen = pygame.display.set_mode((0, 0), FULLSCREEN | DOUBLEBUF | HWSURFACE)
+W, H = screen.get_size()
+#autorisations = ['dom','leo']
+autorisations = {'dmak19':u' D. Makowski, neuropsychologue certifié', \
+'ldut18':u'le Dr. L. Dutriaux, chercheur en sciences cognitives',\
+'lrib00':u'L. Ribeiro de Jesus, étudiante en psychologie'
+}
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+def ecrire (phrase, police, taille, (x,y), color_font,color_background=None,passer=None): #"K_RETURN" pour entrer
+    police = pygame.font.SysFont(police, taille)
+    surface=police.render(phrase, 1, color_font)
+    rectangle = surface.get_rect()
+    rectangle.center = (x,y)
+    if color_background==None:
+        pass
+    else:
+        screen.fill(color_background)
+    screen.blit(surface, rectangle)
+    if passer==None:
+        pass
+    elif isinstance(passer, int ):
+        pygame.display.flip()
+        pygame.time.wait(passer)
+    else:
+        boucle=True
+        while boucle:
+            pygame.display.flip()
+            for event in pygame.event.get():
+                if event.type == KEYDOWN and event.key == eval(passer):
+                    boucle=False
+                if event.type == KEYDOWN and event.key == K_ESCAPE:
+                    #pygame.quit()
+                    quit()
+                    #raise Exception
+
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+def affiche (image, (x,y), color_background=None,scale = 450,path='./'):#attention pas de flip dans cette fonction non plus
+    limage=pygame.image.load(path+image+'.png')
+    large=limage.get_width()
+    haute=limage.get_height()
+    limage=pygame.transform.smoothscale(limage,(large*scale/H,haute*scale/H))
+    rectangle = limage.get_rect()
+    rectangle.center = (x,y)
+    if color_background==None:
+        pass
+    else:
+        screen.fill(color_background)
+    screen.blit(limage,rectangle)
+
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+def instructions (consignes,test, origindirectory,(x,y)=(W/2,H/8), color_background=(255, 255, 255),scale = 450,path='./'):#attention pas de flip dans cette fonction non plus
+    limage=pygame.image.load(origindirectory[0]+'/Docs/'+'consignes_'+test+'.png')
+    large=limage.get_width()
+    haute=limage.get_height()
+    limage=pygame.transform.smoothscale(limage,(large*scale/H,haute*scale/H))
+    rectangle = limage.get_rect()
+    rectangle.center = (x,y)
+    if color_background==None:
+        pass
+    else:
+        screen.fill(color_background)
+    screen.blit(limage,rectangle)
+    write_instructions(consignes)
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+def lignes_rouges(center=False):
+    police = pygame.font.SysFont("lucida console", W/14)
+    d=police.render('d', 1, (0, 0, 0))
+    large=d.get_width()
+    haute=d.get_height()
+    if center == False:
+        pygame.draw.line(screen, (255,0,0), [W/2,H/2-haute], [W/2,H/2+haute], 2)
+        pygame.draw.line(screen, (255,0,0), [W/2-large,H/2-haute], [W/2-large,H/2+haute], 2)
+    else:
+        pygame.draw.line(screen, (255,0,0), [W/2-(large/2),H/2-haute], [W/2-(large/2),H/2+haute], 2)
+        pygame.draw.line(screen, (255,0,0), [W/2+(large/2),H/2-haute], [W/2+(large/2),H/2+haute], 2)
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+def ligne():
+    police = pygame.font.SysFont("lucida console", W/14)
+    d=police.render('d', 1, (0, 0, 0))
+    large=d.get_width()
+    haute=d.get_height()
+    pygame.draw.line(screen, (0,0,0), [W/2-W/4,H/2], [W/2+W/4,H/2], 2)
+
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+
+
+def text_input(question,(x,y),color_text=(0,0,0),background = (255,255,255),allowable=None):#fait comme raw_input mais en blittant avec pygame, (x,y) controle les coordonnées d'affichage. Nécessite la bibliothèque _keys
+    _keys = {97: 'q', 98: 'b', 99: 'c', 100: 'd', 101 : 'e', \
+         102: 'f', 103: 'g', 104: 'h', 105: 'i', 106: 'j', \
+         107: 'k', 108: 'l', 59: 'm', 110: 'n', 111: 'o',\
+         112: 'p', 113: 'a', 114: 'r', 115: 's', 116: 't',\
+         117: 'u', 118: 'v', 119: 'z', 120: 'x', 121: 'y',\
+         122: 'w', 57: 'ç', 56: '_', 55: 'è', 54: '-', 53: '(',\
+         52: "_", 51: '_', 50: 'é', 49: '&', 48: 'à', 32: '_',\
+         K_KP0: '0',K_KP1: '1',K_KP2: '2',K_KP3: '3',K_KP4: '4',\
+         K_KP5: '5',K_KP6: '6',K_KP7: '7',K_KP8: '8',K_KP9: '9'}
+    _shiftkeys = {97: 'Q', 98: 'B', 99: 'C', 100: 'D', 101 : 'E', \
+         102: 'F', 103: 'G', 104: 'H', 105: 'I', 106: 'J', \
+         107: 'K', 108: 'L', 59: 'M', 110: 'N', 111: 'O',\
+         112: 'P', 113: 'A', 114: 'R', 115: 'S', 116: 'T',\
+         117: 'U', 118: 'V', 119: 'Z', 120: 'X', 121: 'Y',\
+         122: 'W', 57: '9', 56: '8', 55: '7', 54: '6', 53: '5',\
+         52: '4', 51: '3', 50: '2', 49: '1', 48: '0', 32: '_',\
+         K_KP0: '0',K_KP1: '1',K_KP2: '2',K_KP3: '3',K_KP4: '4',\
+         K_KP5: '5',K_KP6: '6',K_KP7: '7',K_KP8: '8',K_KP9: '9'}
+    _altgrkeys = {97: 'q', 98: 'b', 99: 'c', 100: 'd', 101 : '€', \
+         102: 'f', 103: 'g', 104: 'h', 105: 'i', 106: 'j', \
+         107: 'k', 108: 'l', 59: 'm', 110: 'n', 111: 'o',\
+         112: 'p', 113: 'a', 114: 'r', 115: 's', 116: 't',\
+         117: 'u', 118: 'v', 119: 'z', 120: 'x', 121: 'y',\
+         122: 'w', 57: '^', 56: '_', 55: '`', 54: '|', 53: '[',\
+         52: '{', 51: '#', 50: '~', 49: '1', 48: '@', 32: '_',\
+         K_KP0: '0',K_KP1: '1',K_KP2: '2',K_KP3: '3',K_KP4: '4',\
+         K_KP5: '5',K_KP6: '6',K_KP7: '7',K_KP8: '8',K_KP9: '9'}
+    output=''
+    boucle=True
+    while boucle:
+        police = pygame.font.SysFont("arialblack", W/30)
+        surface=police.render(question, 1, color_text)
+        size = surface.get_size()
+        pygame.draw.rect(screen, background, (x,y,size[0],size[1]))
+        screen.blit(surface, (x,y))
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key in _keys and pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                    output=output+_shiftkeys[event.key]
+                    question = question + _shiftkeys[event.key]
+                elif event.key in _keys and pygame.key.get_mods() & pygame.KMOD_RALT:
+                    output=output+_altgrkeys[event.key]
+                    question = question + _altgrkeys[event.key]
+                elif event.key in _keys:
+                    output=output+_keys[event.key]
+                    question = question + _keys[event.key]
+                elif event.key == K_BACKSPACE:
+                    if output=='':
+                        pass
+                    else:
+                        output=output[:len(output)-1]
+                        question=question[:len(question)-1]
+                elif event.key == K_RETURN:
+                    if allowable==None:
+                        if output=='':
+                            output='NA'
+                        return(output)
+                        boucle=False
+                    else:
+                        if output in allowable:
+                            if output=='':
+                                output='NA'
+                            return(output)
+                            boucle=False
+                        else:
+                            alerte=question+'    incorrect'
+                            surface=police.render(alerte, 1, color_text)
+                            size = surface.get_size()
+                            pygame.draw.rect(screen,  background, (x,y,size[0],size[1]))
+                            screen.blit(surface, (x,y))
+                            pygame.display.flip()
+                            pygame.time.wait(700)
+                elif event.key == K_ESCAPE:
+                    quit()
+        pygame.draw.rect(screen,  background, (x,y,size[0],size[1]))
+
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+def write_instructions(phrase,passer=False):#affiche consignes, on va à la ligne avec \n
+    police = pygame.font.SysFont("arialblack", W/35)
+    affiche=''
+    ligne = 0
+    for i in range(len(phrase)):
+        if i == (len(phrase)-1):
+            affiche=affiche+phrase[i]
+            surface=police.render(affiche, 1, (0, 0, 0))
+            rectangle = surface.get_rect()
+            rectangle.center = (W/2,(surface.get_height()/2)+(ligne*surface.get_height()))
+            screen.blit(surface, rectangle)
+        elif phrase[i]=='\n':
+            surface=police.render(affiche, 1, (0, 0, 0))
+            rectangle = surface.get_rect()
+            rectangle.center = (W/2,(surface.get_height()/2)+(ligne*surface.get_height()))
+            screen.blit(surface, rectangle)
+            affiche=""
+            ligne = ligne +1
+        else:
+            affiche=affiche+phrase[i]
+            if phrase[i] == " ":
+                tampon=affiche
+                for x in range (len(phrase)-i-1):
+                    if phrase[i+x+1]=='\n'or phrase[i+x+1]== " ":
+                        break
+                    else:
+                        tampon=tampon+phrase[i+x+1]
+                surfacetampon=police.render(tampon, 1, (0, 0, 0))
+                rectangle = surfacetampon.get_rect()
+                if surfacetampon.get_width()+W/4>W:
+                    surface=police.render(affiche, 1, (0, 0, 0))
+                    rectangle = surface.get_rect()
+                    rectangle.center = (W/2,(surface.get_height()/2)+(ligne*surface.get_height()))
+                    screen.blit(surface, rectangle)
+                    affiche=""
+                    ligne = ligne +1
+                else:
+                    pass
+
+    boucle=True
+    while boucle:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if passer == False:
+                if event.type == KEYDOWN and event.key == K_SPACE:
+                    boucle=False
+            if passer == True:
+                boucle=False
+            if event.type == KEYDOWN and event.key == K_ESCAPE:
+                quit()
+                #raise Exception
+
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+
+def decompte_chiffre(position=(W/2,H/6),colour=(255, 0, 0),background=(190, 190, 190)):
+    rebours = ['3','2','1']
+    police = pygame.font.SysFont("arial", W/10)
+    d=police.render('3', 1, (0, 0, 0))
+    large=d.get_width()
+    haute=d.get_height()
+    police2 = pygame.font.SysFont("arial", W/30)
+    d2=police.render('Appuyez sur ESPACE pour commencer', 1, (0, 0, 0))
+    large2=d2.get_width()
+    haute2=d2.get_height()
+    boucle=True
+    ecrire('Appuyez sur ESPACE pour commencer',"arial",W/30, (W/2,H/1.2),(0, 0, 0))
+    while boucle:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == KEYDOWN and event.key == K_SPACE:
+                boucle=False
+    pygame.draw.rect(screen,background,(W/2-(large2/2),H/1.2-(haute2/2),large2,haute2))
+    for i in range (3):
+        pygame.draw.rect(screen,background,(position[0]-(large/2),position[1]-(haute/2),large,haute))
+        ecrire(rebours[i],"arial", W/10, position,colour)
+        pygame.display.flip()
+        pygame.time.wait(1000)
+
+
+
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+def decompte_visuel(position=(W/2-30,H/6),colour=(255, 0, 0),background=(190, 190, 190)):
+    rebours = ['3','2','1']
+    boucle=True
+    width=[(W/3-W/20),W/3+W/10]
+    duration=3
+    speed=1000
+
+    while boucle:
+        #pygame.draw.rect(screen, (0, 0, 0), (width[0],(H/9)*1.8,width[1],(H/9*2.3)))
+        #pygame.draw.rect(screen, colour, (width[0],H/9*2,width[1],(H/9*2.1)))
+        ecrire('Appuyez sur ESPACE pour commencer',"arial", W/30, (W/2,H/1.2),(0, 0, 0),background)
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == KEYDOWN and event.key == K_SPACE:
+                boucle=False
+    for i in range (int(float(duration)*1000/float(speed))):
+        screen.fill(background)
+        pygame.draw.rect(screen, colour, (width[0],H/9*2.0,width[1],(H/9*2.05)))
+        pygame.display.flip()
+        width[1] = width[1]-(1/(duration*1000/speed))*width[1]
+        pygame.time.wait(speed)
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+
+def SCALE(origindirectory,anchors = ['',''], edges = [-1,1]):
+    ecrire(anchors[0],'arialblack', W/50,((W/3)-W/6, H/9*6),(0,0,0))
+    ecrire(anchors[1],'arialblack', W/50,(2*(W/3)+W/6, H/9*6),(0,0,0))
+    pygame.draw.line(screen, (0,0,0), [(W/3),(H/9)*6], [2*(W/3),(H/9)*6], 4)
+    pygame.display.flip()
+
+    boucle= True
+    while boucle == True:
+        for event in pygame.event.get():
+            x, y = pygame.mouse.get_pos()
+            if event.type == KEYDOWN and event.key == K_ESCAPE:
+            	response = 'NA'
+            	boucle = False
+            elif y <(H/9)*7 and y >(H/9)*5 and x > (W/3)-W/12 and x < 2*(W/3)+W/12:
+                if x < (W/3):
+                    x = (W/3) #maintenir le x
+                elif x > 2*(W/3):
+                    x = 2*(W/3) #maintenir le x
+                pygame.draw.rect(screen, (255,255,255), ((W/3-W/20),(H/9)*5,W/3+W/10,(H/2)))
+                pygame.draw.line(screen, (0,0,0), [(W/3),(H/9)*6], [2*(W/3),(H/9)*6], 4)
+                affiche('cursor',(x,H/9*6),scale=200,path=origindirectory[0]+'/Docs/')
+                pygame.display.flip()
+                if pygame.mouse.get_pressed()==(1,0,0):
+                    response = x*((edges[1]-edges[0])/float(W/float(3)))-((W/float(3))*((edges[1]-edges[0])/float(W/float(3)))-edges[0])
+                    affiche('cursor_validated',(x,H/9*6),scale=200,path=origindirectory[0]+'/Docs/')
+                    pygame.display.flip()
+                    pygame.time.wait(100)
+                    boucle = False
+                    #print(response)
+
+            else:
+                pygame.draw.line(screen, (0,0,0), [W/3,(H/9)*6], [2*(W/3),(H/9)*6], 4)
+                pygame.display.flip()
+    return(response)
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+def merge(numero,initiales,summary=True):
+    read = open('data/'+numero+initiales+'.csv', 'r')
+    writeFile = open('data/database_trials.csv', 'a')
+    readFile = open('data/database_trials.csv', 'r')
+    for line in iter(read.readline,''):
+        if line != readFile.readline():
+            writeFile.write(line)
+        else:
+            pass
+    writeFile.close()
+    readFile.close()
+    read.close
+    if summary==True:
+        read = open('data/'+numero+initiales+'_summary.csv', 'r')
+        writeFile = open('data/database.csv', 'a')
+        readFile = open('data/database.csv', 'r')
+        for line in iter(read.readline,''):
+            if line != readFile.readline():
+                writeFile.write(line)
+            else:
+                pass
+        writeFile.close()
+        readFile.close()
+        read.close
+
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+def calculate_age(Birthdate):
+    today = date.today()
+    return today.year - Birthdate[0] - ((today.month, today.day) < (Birthdate[1], Birthdate[2]))
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+def START(version,authors,test,origindirectory,subject_code):
+    global suj,init,sexe,age,lateralisation,civilite
+    screen.fill((255, 255, 255))
+    affiche('Logo_'+test,(W/2,H/2.5),path=origindirectory[0]+'/Docs/')
+    ecrire(version,'arialblack', W/70,(W/1.3, H/9*2.5),(0,0,0))
+    ecrire(authors,'arialblack', W/70,(W/2, H/9*5),(0,0,0))
+    ecrire('Appuyez sur ENTREE pour commencer.','arialblack',W/50,(W/2, H/9*8),(0,0,0),passer="K_RETURN")
+    subject_code = subject_code
+##    pygame.display.flip()
+##    screen.fill((255, 255, 255))
+##    affiche('Logo_'+test,(W/2,H/6),path=origindirectory[0]+'/Docs/')
+##    suj = text_input('Sujet n°',(W/2.4,H/9*3))
+##    init = text_input('Initiales : ',(W/7,H/9*4),(0,0,0))
+##    if os.path.isfile('data/'+suj+init+'.csv')==True:
+##        overwrite = text_input('Fichier déjà existant, écraser ? (o/n) : ',(W/20,H/9*7),(255,0,0),allowable=['o','n'])
+##        if overwrite == 'o':
+##            pygame.draw.rect(screen, (255, 255, 255), (0,H/9*5,W,(H/9*4)))
+##            sexe = text_input('Genre (m/f) : ',(W/7,H/9*5),(0,0,0),allowable=['m','f'])
+##            age = text_input('Âge : ',(W/7,H/9*6),(0,0,0),allowable=map(str,range(150)))
+##            lateralisation = text_input('Latéralisation (g/d) : ',(W/7,H/9*7),(0,0,0),allowable=['g','d'])
+##        else:
+##            START(version,authors)
+
+
+##
+###-------------------------------------------------------------
+###-------------------------------------------------------------
+###-------------------------------------------------------------
+##def START(version,authors,test,origindirectory):
+##    global suj,init,sexe,age,lateralisation,civilite
+##    screen.fill((255, 255, 255))
+##    affiche('Logo_'+test,(W/2,H/2.5),path=origindirectory[0]+'/Docs/')
+##    ecrire(version,'arialblack', W/70,(W/1.3, H/9*2.5),(0,0,0))
+##    ecrire(authors,'arialblack', W/70,(W/2, H/9*5),(0,0,0))
+##    ecrire('Appuyez sur ENTREE pour commencer.','arialblack',W/50,(W/2, H/9*8),(0,0,0),passer="K_RETURN")
+##    pygame.display.flip()
+##    screen.fill((255, 255, 255))
+##    affiche('Logo_'+test,(W/2,H/6),path=origindirectory[0]+'/Docs/')
+##    suj = text_input('Sujet n°',(W/2.4,H/9*3))
+##    if suj == '':
+##        dfref = pandas.read_csv('data/database.csv',header = 0,engine='python')
+##        suj = str(max(dfref.Sujet)+1)
+##    init = text_input('Initiales : ',(W/7,H/9*4),(0,0,0))
+##    if os.path.isfile('data/'+suj+init+'.csv')==True:
+##        overwrite = text_input('Fichier déjà existant, écraser ? (o/n) : ',(W/20,H/9*7),(255,0,0),allowable=['o','n'])
+##        if overwrite == 'o':
+##            pygame.draw.rect(screen, (255, 255, 255), (0,H/9*5,W,(H/9*4)))
+##            sexe = text_input('Genre (m/f) : ',(W/7,H/9*5),(0,0,0),allowable=['m','f'])
+##            if sexe == 'm':
+##                civilite = 'M. '
+##            if sexe == 'f':
+##                civilite = 'Mme. '
+##            age = text_input('Âge : ',(W/7,H/9*6),(0,0,0),allowable=map(str,range(150)))
+##            lateralisation = text_input('Latéralisation (g/d) : ',(W/7,H/9*7),(0,0,0),allowable=['g','d'])
+##        else:
+##            START(version,authors)
+##    else:
+##        sexe = text_input('Genre (m/f) : ',(W/7,H/9*5),(0,0,0),allowable=['m','f'])
+##        if sexe == 'm':
+##            civilite = 'M. '
+##        if sexe == 'f':
+##            civilite = 'Mme. '
+##        age = text_input('Âge : ',(W/7,H/9*6),(0,0,0),allowable=map(str,range(150)))
+##        lateralisation = text_input('Latéralisation (g/d) : ',(W/7,H/9*7),(0,0,0),allowable=['g','d'])
+
+
+
+
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+def END(test,origindirectory):
+    global visualize,autre_test
+    screen.fill((255, 255, 255))
+    affiche('Logo_'+test,(W/2,H/6),path=origindirectory[0]+'/Docs/')
+    pygame.display.flip()
+    #save_df = text_input('Ajouter à la base de données ? (o/n) : ',(W/20,H/9*3),(0,0,0),allowable=['o','n'])
+    visualize = text_input('Aperçu des résultats ? (o/n) : ',(W/20,H/9*3),(0,0,0),allowable= ['o','n'])
+    autre_test = text_input('Souhaitez-vous faire un autre test ? (o/n) : ',(W/20,H/9*4),(0,0,0),allowable= ['o','n'])
+##    if save_df == 'o':
+##        read = open('data/'+numero+initiales+'.csv', 'r')
+##        writeFile = open('data/database_trials.csv', 'a')
+##        readFile = open('data/database_trials.csv', 'r')
+##        for line in iter(read.readline,''):
+##            if line != readFile.readline():
+##                writeFile.write(line)
+##            else:
+##                pass
+##        writeFile.close()
+##        readFile.close()
+##        read.close
+##        if summary==True:
+##            read = open('data/'+numero+initiales+'_summary.csv', 'r')
+##            writeFile = open('data/database.csv', 'a')
+##            readFile = open('data/database.csv', 'r')
+##            for line in iter(read.readline,''):
+##                if line != readFile.readline():
+##                    writeFile.write(line)
+##                else:
+##                    pass
+##            writeFile.close()
+##            readFile.close()
+##            read.close
+
+
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
